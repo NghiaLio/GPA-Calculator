@@ -1,0 +1,119 @@
+/* === GUIDED TOUR === */
+
+/* Backdrop overlay with the "hole" */
+.tour-hole {
+  position: fixed;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65);
+  z-index: 9998;
+  pointer-events: none; /* Let clicks pass through the hole if needed */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Invisible blocker to prevent clicking on other things during tour */
+.tour-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  cursor: default;
+}
+
+/* Tooltip Popover */
+.tour-popover {
+  position: fixed;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  width: 320px;
+  max-width: 90vw;
+  z-index: 10000;
+  padding: 20px;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: auto; /* Allow clicking buttons inside popover */
+}
+
+.tour-popover.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tour-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-desc {
+  font-size: 13.5px;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.tour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tour-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.tour-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  transition: 0.2s;
+}
+
+.tour-dot.active {
+  background: var(--blue);
+  width: 16px;
+  border-radius: 4px;
+}
+
+.tour-controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* Help Button (Replay Tour) */
+.btn-help {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: var(--shadow-md);
+  border: none;
+  cursor: pointer;
+  z-index: 9000;
+  transition: 0.2s;
+}
+
+.btn-help:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.tour-target-highlight {
+  position: relative;
+  z-index: 10001; /* Elevate target if possible */
+}

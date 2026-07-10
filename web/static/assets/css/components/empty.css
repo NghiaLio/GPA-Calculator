@@ -1,0 +1,18 @@
+/* === EMPTY === */
+.empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--gray-400);
+}
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.empty p {
+  font-size: 14px;
+}
+.empty .hint {
+  font-size: 12px;
+  margin-top: 8px;
+}
+

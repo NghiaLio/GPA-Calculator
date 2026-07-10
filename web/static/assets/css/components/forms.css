@@ -1,0 +1,16 @@
+/* === SELECT === */
+select.filter-select {
+  padding: 7px 12px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: var(--gray-700);
+  cursor: pointer;
+  outline: none;
+}
+select.filter-select:focus {
+  border-color: var(--primary);
+}
+

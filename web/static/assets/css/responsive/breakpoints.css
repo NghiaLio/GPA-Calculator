@@ -1,0 +1,130 @@
+@media (max-width: 768px) {
+  .header,
+  .stats-bar,
+  .toolbar,
+  .main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .header {
+    align-items: flex-start;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .header-right .btn {
+    flex: 1 1 160px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-item {
+    padding: 0 0 10px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .stat-item:nth-child(5) {
+    border-bottom: none;
+  }
+  .toolbar {
+    align-items: stretch;
+  }
+  .toolbar-filters,
+  .toolbar-actions {
+    width: 100%;
+  }
+  .toolbar-actions .btn {
+    flex: 1 1 160px;
+  }
+  .semester-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+  .modal-body,
+  .modal-hd,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .calc-box {
+    flex-direction: column;
+  }
+  .calc-item {
+    padding: 10px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .calc-item:last-child {
+    border-bottom: none;
+  }
+  .preview-wrap {
+    max-height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .header-left h1 {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+  .header-left p {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .stats-bar {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .stat-item {
+    padding: 12px 0;
+  }
+  .stat-item:not(:last-child) {
+    margin-bottom: 0;
+  }
+  .toolbar {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .toolbar-actions .btn {
+    flex: 1 1 100%;
+  }
+  .header-right .btn {
+    flex: 1 1 100%;
+  }
+  .main {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  .empty {
+    padding: 44px 16px;
+  }
+  .overlay {
+    padding: 8px;
+  }
+  .modal-body {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .scale-tbl tbody td,
+  .scale-tbl thead th {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}

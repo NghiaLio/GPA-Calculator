@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bảng Điểm Học Tập</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/bang_diem.css" />
+    <link rel="stylesheet" href="/assets/css/components/paste-import.css" />
+    <link rel="stylesheet" href="/assets/css/components/toast.css" />
+    <link rel="stylesheet" href="/assets/css/components/tour.css" />
+    <link rel="stylesheet" href="/assets/css/responsive/breakpoints.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <!-- Firebase SDK (v9/v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    
+    <script src="/assets/js/core/firebase-client.js?v=2"></script>
+    <script src="/assets/js/core/api.js?v=2"></script>
+    <script src="/assets/js/ui/components/toast.js?v=2"></script>
+    <script src="/assets/js/core/grades.js?v=2"></script>
+    <script src="/assets/js/ui/formatters.js?v=2"></script>
+    <script src="/assets/js/core/state.js?v=2"></script>
+    <script src="/assets/js/ui/components/header.js?v=2"></script>
+    <script src="/assets/js/ui/components/dashboard-shell.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/subject-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/paste-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/scale-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/edit-scale-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/excel-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/confirm-modal.js?v=2"></script>
+    <script src="/assets/js/ui/components/modals/login-modal.js?v=2"></script>
+    <script src="/assets/js/ui/layout.js?v=2"></script>
+    <script src="/assets/js/ui/render.js?v=2"></script>
+    <script src="/assets/js/features/subjects.js?v=2"></script>
+    <script src="/assets/js/features/paste.js?v=2"></script>
+    <script src="/assets/js/features/excel.js?v=2"></script>
+    <script src="/assets/js/ui/modals.js?v=2"></script>
+    <script src="/assets/js/features/auth.js?v=2"></script>
+    <script src="/assets/js/features/tour.js?v=2"></script>
+    <script src="/assets/js/app.js?v=2"></script>
+    
+    <!-- Help Button to replay tour -->
+    <button class="btn-help" onclick="replayTour()" title="Xem lại hướng dẫn">?</button>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+/* === FORM === */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-group.full {
+  grid-column: 1/-1;
+}
+.form-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--gray-600);
+  letter-spacing: 0.02em;
+}
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  padding: 9px 12px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--gray-900);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.calc-box {
+  background: var(--gray-50);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 16px;
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--gray-100);
+}
+.calc-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 14px;
+  border-right: 1px solid var(--gray-200);
+}
+.calc-item:first-child {
+  padding-left: 0;
+}
+.calc-item:last-child {
+  border-right: none;
+}
+.calc-item-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-400);
+}
+.calc-item-value {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.2;
+}
