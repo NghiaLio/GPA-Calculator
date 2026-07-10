@@ -2,8 +2,10 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
@@ -23,12 +25,29 @@ func InitFirebase(credentialsJSON string) (*firebase.App, error) {
 		return nil, fmt.Errorf("Chuỗi JSON cấu hình Firebase trống")
 	}
 
+	// Xóa khoảng trắng thừa và dấu nháy đơn/kép bị dư do copy/paste sai trên Heroku
+	credentialsJSON = strings.TrimSpace(credentialsJSON)
+	if strings.HasPrefix(credentialsJSON, "'") && strings.HasSuffix(credentialsJSON, "'") {
+		credentialsJSON = strings.Trim(credentialsJSON, "'")
+	}
+
 	ctx := context.Background()
+
+	// Trích xuất ProjectID từ JSON để gán tường minh (Tránh lỗi project id is required)
+	var cred struct {
+		ProjectID string `json:"project_id"`
+	}
+	_ = json.Unmarshal([]byte(credentialsJSON), &cred)
 
 	// Sử dụng option.WithCredentialsJSON thay vì đọc từ file
 	opt := option.WithCredentialsJSON([]byte(credentialsJSON))
 	
-	app, err := firebase.NewApp(ctx, nil, opt)
+	config := &firebase.Config{}
+	if cred.ProjectID != "" {
+		config.ProjectID = cred.ProjectID
+	}
+
+	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
 		return nil, fmt.Errorf("Lỗi khởi tạo Firebase App: %v", err)
 	}
