@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"go-ssr/internal/database"
@@ -39,6 +40,7 @@ func SaveGradesHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
+		log.Printf("Lỗi lưu Firestore cho UID %s: %v", uid, err)
 		http.Error(w, "Lỗi khi lưu vào Firestore", http.StatusInternalServerError)
 		return
 	}
@@ -60,6 +62,7 @@ func LoadGradesHandler(w http.ResponseWriter, r *http.Request) {
 
 	doc, err := database.FirestoreClient.Collection("users").Doc(uid).Get(ctx)
 	if err != nil {
+		log.Printf("Lỗi tải Firestore cho UID %s (có thể user mới): %v", uid, err)
 		// Có thể document chưa tồn tại (user mới)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

@@ -30,6 +30,11 @@ func InitFirebase(credentialsJSON string) (*firebase.App, error) {
 	if strings.HasPrefix(credentialsJSON, "'") && strings.HasSuffix(credentialsJSON, "'") {
 		credentialsJSON = strings.Trim(credentialsJSON, "'")
 	}
+	if strings.HasPrefix(credentialsJSON, "\"") && strings.HasSuffix(credentialsJSON, "\"") {
+		credentialsJSON = strings.Trim(credentialsJSON, "\"")
+		// Xử lý các escape character nếu có (Vd: {\"type\":...})
+		credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\"", "\"")
+	}
 
 	ctx := context.Background()
 
@@ -37,7 +42,11 @@ func InitFirebase(credentialsJSON string) (*firebase.App, error) {
 	var cred struct {
 		ProjectID string `json:"project_id"`
 	}
-	_ = json.Unmarshal([]byte(credentialsJSON), &cred)
+	if err := json.Unmarshal([]byte(credentialsJSON), &cred); err != nil {
+		log.Printf("⚠️ Cảnh báo: Lỗi parse JSON Firebase: %v. Có thể Config Vars trên Heroku nhập sai định dạng.", err)
+	} else {
+		log.Printf("✅ Parse Firebase JSON thành công, ProjectID: %s", cred.ProjectID)
+	}
 
 	// Sử dụng option.WithCredentialsJSON thay vì đọc từ file
 	opt := option.WithCredentialsJSON([]byte(credentialsJSON))
