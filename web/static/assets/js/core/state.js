@@ -23,7 +23,7 @@ function getProcessedSubjects() {
 
   // Lọc theo tìm kiếm
   if (searchQuery !== "") {
-    list = list.filter(s => (s.ten || "").toLowerCase().includes(searchQuery));
+    list = list.filter(s => (s.tenMon || "").toLowerCase().includes(searchQuery));
   }
 
   // Sắp xếp
@@ -42,10 +42,10 @@ function getProcessedSubjects() {
       };
 
       if (sortMode === "name_asc") {
-        return (a.ten || "").localeCompare(b.ten || "");
+        return (a.tenMon || "").localeCompare(b.tenMon || "");
       }
       if (sortMode === "name_desc") {
-        return (b.ten || "").localeCompare(a.ten || "");
+        return (b.tenMon || "").localeCompare(a.tenMon || "");
       }
       if (sortMode === "tc_desc") {
         return (parseFloat(b.tinChi) || 0) - (parseFloat(a.tinChi) || 0);
