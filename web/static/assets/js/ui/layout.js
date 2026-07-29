@@ -10,4 +10,8 @@ function renderShell() {
     confirmModalTemplate(),
     loginModalTemplate(),
   ].join("");
+
+  if (typeof updateHeaderUserUI === "function") {
+    updateHeaderUserUI(typeof currentUser !== "undefined" ? currentUser : null);
+  }
 }
