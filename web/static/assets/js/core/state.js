@@ -10,6 +10,14 @@ let pasteRows = [];
 let searchQuery = "";
 let sortMode = "default"; // default, name_asc, name_desc, hp_desc, hp_asc, tc_desc
 
+function normalizeText(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 function setFilterSearch(query) {
   searchQuery = (query || "").toLowerCase().trim();
 }
@@ -23,7 +31,7 @@ function getProcessedSubjects() {
 
   // Lọc theo tìm kiếm
   if (searchQuery !== "") {
-    list = list.filter(s => (s.tenMon || "").toLowerCase().includes(searchQuery));
+    list = list.filter(s => normalizeText(s.tenMon).includes(searchQuery));
   }
 
   // Sắp xếp
@@ -42,10 +50,10 @@ function getProcessedSubjects() {
       };
 
       if (sortMode === "name_asc") {
-        return (a.tenMon || "").localeCompare(b.tenMon || "");
+        return normalizeText(a.tenMon).localeCompare(normalizeText(b.tenMon));
       }
       if (sortMode === "name_desc") {
-        return (b.tenMon || "").localeCompare(a.tenMon || "");
+        return normalizeText(b.tenMon).localeCompare(normalizeText(a.tenMon));
       }
       if (sortMode === "tc_desc") {
         return (parseFloat(b.tinChi) || 0) - (parseFloat(a.tinChi) || 0);

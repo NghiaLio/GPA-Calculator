@@ -3,7 +3,7 @@ function renderAll() {
   const list = getProcessedSubjects();
   document.getElementById("countLabel").textContent =
     `TỔNG SỐ: ${list.length} MÔN HỌC`;
-  renderStats(list);
+  renderStats(subjects, list);
   renderTable(list);
   
   // Tự động lưu trạng thái khi có bất kỳ thay đổi nào khiến render lại
@@ -12,8 +12,9 @@ function renderAll() {
   }
 }
 
-function renderStats(list) {
-  const st = calcGPA(list);
+function renderStats(allSubjects, visibleSubjects) {
+  const st = calcGPA(allSubjects || subjects);
+  const displayCount = visibleSubjects ? visibleSubjects.length : st.n;
   const rk =
     st.rank !== "—"
       ? `<span style="font-size:12px;font-weight:700;color:${rankColor(st.rank)}">${st.rank}</span>`
@@ -41,7 +42,7 @@ function renderStats(list) {
     </div>
     <div class="stat-item">
       <div class="stat-label">Số môn học</div>
-      <div class="stat-value gray">${st.n}</div>
+      <div class="stat-value gray">${displayCount}</div>
       <div class="stat-sub">môn học</div>
     </div>
   `;
