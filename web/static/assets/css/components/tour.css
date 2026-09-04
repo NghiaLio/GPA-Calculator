@@ -1,20 +1,20 @@
 /* === GUIDED TOUR === */
 
-/* Backdrop overlay with the "hole" */
+/* Backdrop overlay with the "hole" cutout */
 .tour-hole {
   position: fixed;
   border-radius: 8px;
-  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65);
-  z-index: 9998;
-  pointer-events: none; /* Let clicks pass through the hole if needed */
-  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 0 3px #3b82f6, 0 0 0 9999px rgba(15, 23, 42, 0.65);
+  z-index: 9999;
+  pointer-events: none; /* Let clicks pass through the hole */
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Invisible blocker to prevent clicking on other things during tour */
 .tour-blocker {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 9998;
   cursor: default;
 }
 
@@ -23,12 +23,12 @@
   position: fixed;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-  width: 320px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  width: 340px;
   max-width: 90vw;
   z-index: 10000;
   padding: 20px;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   opacity: 0;
   transform: translateY(10px);
   pointer-events: auto; /* Allow clicking buttons inside popover */
@@ -105,7 +105,7 @@
   border: none;
   cursor: pointer;
   z-index: 9000;
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-help:hover {
@@ -115,5 +115,5 @@
 
 .tour-target-highlight {
   position: relative;
-  z-index: 10001; /* Elevate target if possible */
+  z-index: 10001;
 }

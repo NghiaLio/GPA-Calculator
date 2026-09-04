@@ -1,4 +1,4 @@
-/* === MODAL === */
+/* === MODAL & VUE TRANSITIONS === */
 .overlay {
   position: fixed;
   inset: 0;
@@ -8,8 +8,10 @@
   justify-content: center;
   z-index: 1000;
   padding: 16px;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.25s ease;
 }
+
 .modal {
   background: white;
   border-radius: 16px;
@@ -17,22 +19,14 @@
   max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-  animation: slideUp 0.2s ease;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .modal-wide {
   max-width: 820px;
 }
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+
 .modal-hd {
   display: flex;
   align-items: center;
@@ -44,10 +38,12 @@
   background: white;
   z-index: 1;
 }
+
 .modal-title {
   font-size: 16px;
   font-weight: 700;
 }
+
 .modal-close {
   width: 30px;
   height: 30px;
@@ -60,13 +56,19 @@
   align-items: center;
   justify-content: center;
   color: var(--gray-500);
+  transition: all 0.2s ease;
 }
+
 .modal-close:hover {
   background: var(--gray-200);
+  color: var(--gray-800);
+  transform: scale(1.05);
 }
+
 .modal-body {
   padding: 22px;
 }
+
 .modal-footer {
   padding: 14px 22px;
   border-top: 1px solid var(--gray-200);
@@ -75,4 +77,37 @@
   gap: 8px;
   background: #fafafa;
   border-radius: 0 0 16px 16px;
+}
+
+/* Vue Modal Transition Classes */
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-from .modal,
+.modal-fade-leave-to .modal {
+  transform: translateY(24px) scale(0.96);
+  opacity: 0;
+}
+
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+}
+
+.modal-fade-enter-to .modal,
+.modal-fade-leave-from .modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-fade-enter-active .modal,
+.modal-fade-leave-active .modal {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
