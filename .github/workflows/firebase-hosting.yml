@@ -27,10 +27,12 @@ jobs:
       - name: 🧹 Build Vue 3 Production Bundle
         run: npm run build
 
-      - name: 🚀 Deploy to Firebase Hosting (Live Channel)
+      - name: 🚀 Deploy to Firebase Hosting (via FIREBASE_TOKEN or Service Account)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EXAM_SCORES_2A86C }}'
           channelId: live
           projectId: exam-scores-2a86c
+        env:
+          FIREBASE_CLI_ATTRIBUTE_OPT_IN: true
