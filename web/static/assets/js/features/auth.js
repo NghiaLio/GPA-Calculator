@@ -1,9 +1,10 @@
 // =================== AUTHENTICATION LOGIC ===================
 
 let currentUser = null;
+let isSyncingFromCloud = false;
 
 // Lắng nghe trạng thái đăng nhập
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
     // Đóng popup đăng nhập nếu đang mở
@@ -18,9 +19,18 @@ auth.onAuthStateChanged((user) => {
     // Tự động ẩn popup yêu cầu đăng nhập nếu người dùng F5
     sessionStorage.setItem("skip_login_prompt", "true");
 
-    // Load dữ liệu từ Backend
-    loadDataFromBackend().then((cloudData) => {
-      if (cloudData) {
+    // Đánh dấu cờ đang kéo dữ liệu từ đám mây về để tránh trigger lưu ngược lên
+    isSyncingFromCloud = true;
+    if (typeof setSyncStatus === "function") {
+      setSyncStatus("loading");
+    }
+
+    try {
+      // Ưu tiên pull dữ liệu từ Backend / Firestore về trước
+      const cloudData = await loadDataFromBackend();
+
+      if (cloudData && (cloudData.subjects?.length > 0 || cloudData.scale || cloudData.weights)) {
+        // Có dữ liệu trên đám mây -> Nạp vào state
         if (cloudData.scale) currentGrades = cloudData.scale;
         if (cloudData.weights) currentWeights = cloudData.weights;
         if (cloudData.subjects) {
@@ -28,7 +38,7 @@ auth.onAuthStateChanged((user) => {
           _id = Math.max(...subjects.map(s => s.id), 0) + 1;
         }
         
-        // Cập nhật lại localStorage theo dữ liệu đám mây
+        // Cập nhật lại sessionStorage theo dữ liệu đám mây
         sessionStorage.setItem("app_grades", JSON.stringify(currentGrades));
         sessionStorage.setItem("app_weights", JSON.stringify(currentWeights));
         sessionStorage.setItem("app_subjects", JSON.stringify(subjects));
@@ -39,14 +49,35 @@ auth.onAuthStateChanged((user) => {
         renderAll(); // Nạp lại bảng dữ liệu
         
         showToast("Đã đồng bộ dữ liệu từ đám mây", "success");
+        if (typeof setSyncStatus === "function") {
+          setSyncStatus("idle");
+        }
       } else {
         // Nếu không có data trên mây (user mới)
         renderShell();
         updateHeaderUserUI(currentUser);
         renderScaleModalUI();
         renderAll();
+
+        // Nếu user đã nhập sẵn môn học ở máy trước khi đăng nhập, tự động đồng bộ lần đầu lên cloud
+        if (subjects && subjects.length > 0) {
+          console.log("Phát hiện dữ liệu local, tự động lưu lên Firestore lần đầu...");
+          isSyncingFromCloud = false; // Mở cờ để cho phép save
+          saveState();
+        } else {
+          if (typeof setSyncStatus === "function") {
+            setSyncStatus("idle");
+          }
+        }
       }
-    });
+    } catch (err) {
+      console.error("Lỗi khi kéo dữ liệu lúc đăng nhập:", err);
+      if (typeof setSyncStatus === "function") {
+        setSyncStatus("error");
+      }
+    } finally {
+      isSyncingFromCloud = false;
+    }
 
   } else {
     currentUser = null;

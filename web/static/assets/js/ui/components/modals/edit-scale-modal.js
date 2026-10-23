@@ -154,6 +154,7 @@ function saveScaleSettings() {
   
   // Recompute all subjects with new settings
   subjects = subjects.map(s => compute(s));
+  saveState();
   renderAll(); // Rerender main table
   
   closeModal('editScaleModal');

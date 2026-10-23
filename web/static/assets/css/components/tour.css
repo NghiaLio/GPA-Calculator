@@ -103,14 +103,25 @@
   font-weight: bold;
   box-shadow: var(--shadow-md);
   border: none;
-  cursor: pointer;
+  cursor: grab;
   z-index: 9000;
-  transition: all 0.2s ease;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
-.btn-help:hover {
+.btn-help:hover:not(.dragging) {
   transform: scale(1.1);
   box-shadow: var(--shadow-lg);
+}
+
+.btn-help:active,
+.btn-help.dragging {
+  cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4), 0 8px 10px -6px rgba(37, 99, 235, 0.3);
+  opacity: 0.92;
 }
 
 .tour-target-highlight {

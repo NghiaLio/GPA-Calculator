@@ -5,11 +5,6 @@ function renderAll() {
     `TỔNG SỐ: ${list.length} MÔN HỌC`;
   renderStats(subjects, list);
   renderTable(list);
-  
-  // Tự động lưu trạng thái khi có bất kỳ thay đổi nào khiến render lại
-  if (typeof saveState === "function") {
-    saveState();
-  }
 }
 
 function renderStats(allSubjects, visibleSubjects) {

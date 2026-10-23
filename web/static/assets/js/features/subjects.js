@@ -86,6 +86,7 @@ function saveSubject() {
   if (editingId) subjects = subjects.map((s) => (s.id === editingId ? c : s));
   else subjects.push(c);
   closeModal("addModal");
+  saveState();
   renderAll();
 }
 
@@ -95,6 +96,7 @@ async function deleteSubject(id) {
   const confirmed = await showConfirm(`Xóa môn "<strong>${s.tenMon}</strong>"?`);
   if (!confirmed) return;
   subjects = subjects.filter((x) => x.id !== id);
+  saveState();
   renderAll();
 }
 
@@ -110,5 +112,6 @@ async function deleteAllSubjects() {
   subjects = [];
   editingId = null;
   pasteRows = [];
+  saveState();
   renderAll();
 }

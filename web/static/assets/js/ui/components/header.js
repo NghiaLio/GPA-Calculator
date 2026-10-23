@@ -81,7 +81,13 @@ function setSyncStatus(status) {
   
   btn.style.transition = "all 0.3s ease";
   
-  if (status === "saving") {
+  if (status === "loading") {
+    btn.innerHTML = "⏳ Đang tải...";
+    btn.style.backgroundColor = "var(--gray-100)";
+    btn.style.color = "var(--gray-500)";
+    btn.style.borderColor = "var(--gray-300)";
+    btn.disabled = true;
+  } else if (status === "saving") {
     btn.innerHTML = "⏳ Đang lưu...";
     btn.style.backgroundColor = "var(--gray-100)";
     btn.style.color = "var(--gray-500)";

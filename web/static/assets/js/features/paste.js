@@ -95,5 +95,6 @@ function parsePasteText(text) {
 function confirmPaste() {
   subjects = [...subjects, ...pasteRows];
   closeModal("pasteModal");
+  saveState();
   renderAll();
 }

@@ -205,3 +205,174 @@ function replayTour() {
   endTour(); // clear existing if any
   startTour();
 }
+
+// =================== DRAGGABLE & MAGNETIC SNAP HELP BUTTON ===================
+function initDraggableHelpButton() {
+  const btn = document.getElementById("btnHelpGuide") || document.querySelector(".btn-help");
+  if (!btn) return;
+
+  const btnSize = 44;
+  const margin = 20;
+  const headerHeight = 70; // Giữ khoảng cách không đè lên header
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let initialLeft = 0;
+  let initialTop = 0;
+  let hasMoved = false;
+
+  // Khôi phục hoặc định vị ban đầu
+  function initPosition() {
+    const savedPos = localStorage.getItem("help_btn_pos");
+    let targetLeft, targetTop;
+
+    if (savedPos) {
+      try {
+        const pos = JSON.parse(savedPos);
+        targetTop = Math.max(headerHeight, Math.min(window.innerHeight - btnSize - margin, pos.top));
+        if (pos.side === "left") {
+          targetLeft = margin;
+        } else {
+          targetLeft = window.innerWidth - btnSize - margin;
+        }
+      } catch (e) {
+        targetLeft = window.innerWidth - btnSize - margin;
+        targetTop = window.innerHeight - btnSize - 24;
+      }
+    } else {
+      targetLeft = window.innerWidth - btnSize - margin;
+      targetTop = window.innerHeight - btnSize - 24;
+    }
+
+    btn.style.left = `${targetLeft}px`;
+    btn.style.top = `${targetTop}px`;
+    btn.style.right = "auto";
+    btn.style.bottom = "auto";
+  }
+
+  initPosition();
+
+  // Tự động căn chỉnh lại cạnh màn hình khi resize cửa sổ
+  window.addEventListener("resize", () => {
+    snapToNearestEdge(false);
+  });
+
+  // Hỗ trợ Pointer Events (cả chuột desktop lẫn touch trên mobile)
+  btn.addEventListener("pointerdown", (e) => {
+    if (e.button !== undefined && e.button !== 0) return; // Chỉ nhận click chuột trái
+
+    isDragging = true;
+    hasMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    const rect = btn.getBoundingClientRect();
+    initialLeft = rect.left;
+    initialTop = rect.top;
+
+    btn.style.transition = "none";
+    btn.classList.add("dragging");
+
+    if (typeof btn.setPointerCapture === "function") {
+      btn.setPointerCapture(e.pointerId);
+    }
+  });
+
+  btn.addEventListener("pointermove", (e) => {
+    if (!isDragging) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (Math.hypot(dx, dy) > 5) {
+      hasMoved = true;
+    }
+
+    let currentLeft = initialLeft + dx;
+    let currentTop = initialTop + dy;
+
+    // Giữ nút không bị kéo ra ngoài mép màn hình
+    currentLeft = Math.max(4, Math.min(window.innerWidth - btnSize - 4, currentLeft));
+    currentTop = Math.max(headerHeight, Math.min(window.innerHeight - btnSize - 4, currentTop));
+
+    btn.style.left = `${currentLeft}px`;
+    btn.style.top = `${currentTop}px`;
+  });
+
+  function onPointerEnd(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    btn.classList.remove("dragging");
+
+    if (typeof btn.releasePointerCapture === "function") {
+      try {
+        btn.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+    }
+
+    // Tự động tính toán để hút về cạnh gần nhất
+    snapToNearestEdge(true);
+  }
+
+  btn.addEventListener("pointerup", onPointerEnd);
+  btn.addEventListener("pointercancel", onPointerEnd);
+
+  // Xử lý click: Nếu có kéo di chuyển thì KHÔNG mở hướng dẫn
+  btn.addEventListener("click", (e) => {
+    if (hasMoved) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    replayTour();
+  });
+
+  function snapToNearestEdge(animate = true) {
+    const rect = btn.getBoundingClientRect();
+    const btnCenter = rect.left + btnSize / 2;
+    const screenCenter = window.innerWidth / 2;
+
+    let targetLeft = 0;
+    let side = "right";
+
+    // Thuật toán: So sánh tâm của nút với tâm màn hình
+    // Nếu nằm ở nửa trái ➔ Hút về mép trái
+    // Nếu nằm ở nửa phải ➔ Hút về mép phải
+    if (btnCenter < screenCenter) {
+      targetLeft = margin;
+      side = "left";
+    } else {
+      targetLeft = window.innerWidth - btnSize - margin;
+      side = "right";
+    }
+
+    // Giữ giới hạn theo trục dọc
+    let targetTop = Math.max(
+      headerHeight,
+      Math.min(window.innerHeight - btnSize - margin, rect.top)
+    );
+
+    if (animate) {
+      // Hiệu ứng lò xo mượt mà khi dội vào mép màn hình
+      btn.style.transition = "left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+    } else {
+      btn.style.transition = "none";
+    }
+
+    btn.style.left = `${targetLeft}px`;
+    btn.style.top = `${targetTop}px`;
+
+    // Lưu lại vị trí để lần truy cập sau vẫn ở đúng bên người dùng thích
+    try {
+      localStorage.setItem("help_btn_pos", JSON.stringify({ side, top: targetTop }));
+    } catch (_) {}
+  }
+}
+
+// Khởi chạy khi tài liệu sẵn sàng
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initDraggableHelpButton);
+} else {
+  initDraggableHelpButton();
+}

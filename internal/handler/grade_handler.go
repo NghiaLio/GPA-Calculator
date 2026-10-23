@@ -8,6 +8,9 @@ import (
 
 	"go-ssr/internal/database"
 	"go-ssr/internal/middleware"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // UserData chứa cấu trúc tổng hợp bảng điểm và cài đặt của user
@@ -62,13 +65,17 @@ func LoadGradesHandler(w http.ResponseWriter, r *http.Request) {
 
 	doc, err := database.FirestoreClient.Collection("users").Doc(uid).Get(ctx)
 	if err != nil {
-		log.Printf("Lỗi tải Firestore cho UID %s (có thể user mới): %v", uid, err)
-		// Có thể document chưa tồn tại (user mới)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"data": nil, // Trả về nil nếu chưa có dữ liệu
-		})
+		if status.Code(err) == codes.NotFound {
+			// Document thực sự chưa tồn tại (user mới đăng ký lần đầu)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"data": nil,
+			})
+			return
+		}
+		log.Printf("Lỗi tải Firestore cho UID %s: %v", uid, err)
+		http.Error(w, "Lỗi khi tải dữ liệu từ Firestore", http.StatusInternalServerError)
 		return
 	}
 

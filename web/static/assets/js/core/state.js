@@ -14,12 +14,13 @@ function normalizeText(value) {
   return String(value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "d"))
     .toLowerCase()
     .trim();
 }
 
 function setFilterSearch(query) {
-  searchQuery = (query || "").toLowerCase().trim();
+  searchQuery = (query || "").trim();
 }
 
 function setFilterSort(mode) {
@@ -31,7 +32,30 @@ function getProcessedSubjects() {
 
   // Lọc theo tìm kiếm
   if (searchQuery !== "") {
-    list = list.filter(s => normalizeText(s.tenMon).includes(searchQuery));
+    const rawQ = searchQuery.toLowerCase();
+    const normQ = normalizeText(searchQuery);
+    const qWords = normQ.split(/\s+/).filter(Boolean);
+
+    list = list.filter((s) => {
+      const rawName = String(s.tenMon || "").toLowerCase();
+      const normName = normalizeText(s.tenMon);
+
+      // 1. Khớp chính xác có dấu (VD: "Toán" khớp "Toán cao cấp")
+      if (rawName.includes(rawQ)) return true;
+
+      // 2. Khớp không dấu (VD: "toan" hoặc "Toán" đều khớp "Toán")
+      if (normName.includes(normQ)) return true;
+
+      // 3. Khớp theo điểm chữ (VD: tìm môn bị "F", môn đạt "A+")
+      if (s.diemChu && String(s.diemChu).toLowerCase() === rawQ) return true;
+
+      // 4. Khớp tất cả các từ trong cụm từ tìm kiếm (không phân biệt thứ tự)
+      if (qWords.length > 1 && qWords.every((w) => normName.includes(w))) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
   // Sắp xếp
@@ -91,6 +115,11 @@ function loadLocalState() {
 function saveState() {
   sessionStorage.setItem("app_subjects", JSON.stringify(subjects));
   
+  // Nếu đang trong quá trình kéo dữ liệu từ đám mây thì không lưu đè lên
+  if (typeof isSyncingFromCloud !== "undefined" && isSyncingFromCloud) {
+    return;
+  }
+
   // Gọi hàm API nếu nó đã được nạp (trong api.js)
   if (typeof saveDataToBackend === "function") {
     // Để không bị lỗi undefined do load file chưa xong

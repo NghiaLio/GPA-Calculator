@@ -69,6 +69,7 @@ function handleExcel(input) {
       if (confirmed) subjects = [...subjects, ...imported];
       else subjects = imported;
       input.value = "";
+      saveState();
       renderAll();
       showToast(`✅ Đã nhập thành công ${imported.length} môn học!`, "success");
     } catch (err) {
