@@ -8,7 +8,7 @@ function initToastContainer() {
   }
 }
 
-function showToast(message, type = "success") {
+function showToast(message, type = "success", opts = {}) {
   initToastContainer();
   const container = document.getElementById("toast-container");
   
@@ -25,6 +25,27 @@ function showToast(message, type = "success") {
     <span class="toast-message">${message}</span>
     <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
   `;
+
+  const dismiss = () => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.remove();
+      }
+    }, 300); // Wait for transition
+  };
+
+  // Nút hành động tuỳ chọn (VD: Hoàn tác)
+  if (opts.action) {
+    const btn = document.createElement("button");
+    btn.className = "toast-action";
+    btn.textContent = opts.action.label;
+    btn.onclick = () => {
+      opts.action.onClick();
+      dismiss();
+    };
+    toast.insertBefore(btn, toast.querySelector(".toast-close"));
+  }
   
   container.appendChild(toast);
   
@@ -33,13 +54,6 @@ function showToast(message, type = "success") {
     toast.classList.add("show");
   }, 10);
   
-  // Auto remove after 3 seconds
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove();
-      }
-    }, 300); // Wait for transition
-  }, 3000);
+  // Auto remove (mặc định sau 3 giây)
+  setTimeout(dismiss, opts.duration || 3000);
 }

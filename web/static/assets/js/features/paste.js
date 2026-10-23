@@ -93,6 +93,7 @@ function parsePasteText(text) {
 }
 
 function confirmPaste() {
+  pushHistory(`Dán ${pasteRows.length} môn học`);
   subjects = [...subjects, ...pasteRows];
   closeModal("pasteModal");
   saveState();

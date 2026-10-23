@@ -150,6 +150,7 @@ function saveScaleSettings() {
     tempGrades[tempGrades.length - 1].min = 0;
   }
 
+  pushHistory("Cập nhật thang điểm & công thức");
   saveSettings(tempGrades, w);
   
   // Recompute all subjects with new settings

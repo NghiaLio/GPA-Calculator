@@ -99,18 +99,61 @@ function compute(r) {
   };
 }
 
+// =================== MÔN HỌC LẠI / CẢI THIỆN ===================
+// Trong một nhóm các môn trùng tên mà có ít nhất một lần được đánh dấu "học lại",
+// chỉ lần có điểm cao nhất được tính vào GPA. Các lần còn lại bị "thay thế".
+function getSupersededSet(list) {
+  const groups = new Map();
+  list.forEach((s) => {
+    const k = normalizeText(s.tenMon);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(s);
+  });
+
+  const superseded = new Set();
+  groups.forEach((arr) => {
+    if (arr.length < 2 || !arr.some((s) => s.hocLai)) return;
+    // Môn chưa có điểm (s4 null) luôn thấp hơn môn đã có điểm, kể cả điểm F
+    const score = (s) => (s.s4 ?? -1) * 1000 + (s.diemHP ?? -1);
+    let best = arr[0];
+    arr.forEach((s) => {
+      if (score(s) > score(best)) best = s;
+    });
+    arr.forEach((s) => {
+      if (s !== best) superseded.add(s);
+    });
+  });
+  return superseded;
+}
+
+function getEffectiveSubjects(list) {
+  const superseded = getSupersededSet(list);
+  return superseded.size ? list.filter((s) => !superseded.has(s)) : list;
+}
+
 function calcGPA(list) {
-  const valid = list.filter(
+  const eff = getEffectiveSubjects(list);
+  const valid = eff.filter(
     (s) => s.diemChu && s.diemChu !== "F" && parseFloat(s.tinChi) > 0,
   );
-  const totalTc = list.reduce((a, s) => a + (parseFloat(s.tinChi) || 0), 0);
+  const totalTc = eff.reduce((a, s) => a + (parseFloat(s.tinChi) || 0), 0);
   const passTc = valid.reduce((a, s) => a + parseFloat(s.tinChi), 0);
-  const failTc = list
+  const failTc = eff
     .filter((s) => s.diemChu === "F")
     .reduce((a, s) => a + parseFloat(s.tinChi || 0), 0);
   if (!passTc)
-    return { gpa: "—", rank: "—", totalTc, passTc: 0, failTc, n: list.length };
-  const g = valid.reduce((a, s) => a + s.s4 * parseFloat(s.tinChi), 0) / passTc;
+    return {
+      gpa: "—",
+      gpaNum: null,
+      rank: "—",
+      totalTc,
+      passTc: 0,
+      points: 0,
+      failTc,
+      n: list.length,
+    };
+  const points = valid.reduce((a, s) => a + s.s4 * parseFloat(s.tinChi), 0);
+  const g = points / passTc;
   const gpaDisplay = Number(fmtRounded(g, 2));
   let rank = "Yếu";
   if (gpaDisplay >= 3.6) rank = "Xuất sắc";
@@ -119,10 +162,74 @@ function calcGPA(list) {
   else if (gpaDisplay >= 2.0) rank = "Trung bình";
   return {
     gpa: fmtRounded(g, 2),
+    gpaNum: g,
     rank,
     totalTc,
     passTc,
+    points,
     failTc,
     n: list.length,
   };
+}
+
+// =================== NHÓM THEO HỌC KỲ ===================
+function semesterLabel(namHoc, hocKy) {
+  const y = String(namHoc || "").trim();
+  const k = String(hocKy || "").trim();
+  if (!y && !k) return "Chưa phân kỳ";
+  const kLabel = !k ? "" : /^\d+$/.test(k) ? `Học kỳ ${k}` : k === "Hè" ? "Học kỳ hè" : k;
+  return [kLabel, y ? `Năm học ${y}` : ""].filter(Boolean).join(" · ");
+}
+
+function semesterShortLabel(namHoc, hocKy) {
+  const y = String(namHoc || "").trim();
+  const k = String(hocKy || "").trim();
+  const kShort = !k ? "" : /^\d+$/.test(k) ? `HK${k}` : k === "Hè" ? "Hè" : k;
+  // 2024-2025 -> 24-25
+  const yShort = y.replace(/(\d{2})(\d{2})-(\d{2})(\d{2})/, "$2-$4");
+  return [kShort, yShort].filter(Boolean).join(" ") || "—";
+}
+
+function semesterKey(s) {
+  return `${String(s.namHoc || "").trim()}|${String(s.hocKy || "").trim()}`;
+}
+
+// Trả về các nhóm đã sắp xếp theo thời gian; nhóm "chưa phân kỳ" luôn ở cuối.
+function getSemesterGroups(list) {
+  const map = new Map();
+  list.forEach((s) => {
+    const k = semesterKey(s);
+    if (!map.has(k)) {
+      map.set(k, {
+        key: k,
+        namHoc: String(s.namHoc || "").trim(),
+        hocKy: String(s.hocKy || "").trim(),
+        items: [],
+      });
+    }
+    map.get(k).items.push(s);
+  });
+
+  const groups = [...map.values()];
+  groups.forEach((g) => {
+    g.unassigned = !g.namHoc && !g.hocKy;
+    g.label = semesterLabel(g.namHoc, g.hocKy);
+    g.shortLabel = semesterShortLabel(g.namHoc, g.hocKy);
+  });
+
+  const kOrder = (k) => (k === "Hè" ? 3 : parseInt(k, 10) || 0);
+  groups.sort((a, b) => {
+    if (a.unassigned !== b.unassigned) return a.unassigned ? 1 : -1;
+    if (a.namHoc !== b.namHoc) return a.namHoc < b.namHoc ? -1 : 1;
+    return kOrder(a.hocKy) - kOrder(b.hocKy);
+  });
+
+  // GPA từng kỳ và GPA tích lũy tính đến hết kỳ đó
+  let acc = [];
+  groups.forEach((g) => {
+    acc = acc.concat(g.items);
+    g.stats = calcGPA(g.items);
+    g.cumulative = calcGPA(acc);
+  });
+  return groups;
 }

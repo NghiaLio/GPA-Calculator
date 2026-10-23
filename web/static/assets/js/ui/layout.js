@@ -9,9 +9,13 @@ function renderShell() {
     editScaleModalTemplate(),
     confirmModalTemplate(),
     loginModalTemplate(),
+    typeof toolsModalTemplate === "function" ? toolsModalTemplate() : "",
   ].join("");
 
   if (typeof updateHeaderUserUI === "function") {
     updateHeaderUserUI(typeof currentUser !== "undefined" ? currentUser : null);
   }
-}
+  if (typeof updateThemeButton === "function") updateThemeButton();
+  if (typeof refreshInstallButton === "function") refreshInstallButton();
+  if (typeof updateHistoryButtons === "function") updateHistoryButtons();
+}

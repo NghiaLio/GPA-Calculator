@@ -3,9 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bảng Điểm Học Tập</title>
-    <!-- Thêm Favicon hình mũ cử nhân -->
+    <title>Bảng Điểm Học Tập | Quản lý điểm & Tính GPA</title>
+    <meta name="description" content="Quản lý điểm và tính GPA thang 4, cảnh báo học vụ, mô phỏng mục tiêu điểm số, gom nhóm học kỳ và đồng bộ đám mây đa thiết bị." />
+    <meta name="theme-color" content="#1e40af" />
+    
+    <!-- PWA & Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <!-- Chống chớp sáng (FOUC) khi dùng Dark mode -->
+    <script>
+      try {
+        const p = JSON.parse(localStorage.getItem("app_prefs") || "{}");
+        const t = p.theme === "light" || p.theme === "dark" 
+          ? p.theme 
+          : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -25,32 +42,45 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
-    <script src="/assets/js/core/firebase-client.js?v=2"></script>
-    <script src="/assets/js/core/api.js?v=2"></script>
-    <script src="/assets/js/ui/components/toast.js?v=2"></script>
-    <script src="/assets/js/core/grades.js?v=2"></script>
-    <script src="/assets/js/ui/formatters.js?v=2"></script>
-    <script src="/assets/js/core/state.js?v=2"></script>
-    <script src="/assets/js/ui/components/header.js?v=2"></script>
-    <script src="/assets/js/ui/components/dashboard-shell.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/subject-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/paste-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/scale-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/edit-scale-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/excel-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/confirm-modal.js?v=2"></script>
-    <script src="/assets/js/ui/components/modals/login-modal.js?v=2"></script>
-    <script src="/assets/js/ui/layout.js?v=2"></script>
-    <script src="/assets/js/ui/render.js?v=2"></script>
-    <script src="/assets/js/features/subjects.js?v=2"></script>
-    <script src="/assets/js/features/paste.js?v=2"></script>
-    <script src="/assets/js/features/excel.js?v=2"></script>
-    <script src="/assets/js/ui/modals.js?v=2"></script>
-    <script src="/assets/js/features/auth.js?v=2"></script>
-    <script src="/assets/js/features/tour.js?v=2"></script>
-    <script src="/assets/js/app.js?v=2"></script>
+    <!-- Core modules -->
+    <script src="/assets/js/core/firebase-client.js?v=3"></script>
+    <script src="/assets/js/core/prefs.js?v=3"></script>
+    <script src="/assets/js/core/history.js?v=3"></script>
+    <script src="/assets/js/core/api.js?v=3"></script>
+    <script src="/assets/js/ui/components/toast.js?v=3"></script>
+    <script src="/assets/js/core/grades.js?v=3"></script>
+    <script src="/assets/js/ui/formatters.js?v=3"></script>
+    <script src="/assets/js/core/state.js?v=3"></script>
+
+    <!-- Feature modules -->
+    <script src="/assets/js/features/insights.js?v=3"></script>
+    <script src="/assets/js/features/tools.js?v=3"></script>
+    <script src="/assets/js/features/report.js?v=3"></script>
+    <script src="/assets/js/features/pwa.js?v=3"></script>
+
+    <!-- UI Components & Modals -->
+    <script src="/assets/js/ui/components/header.js?v=3"></script>
+    <script src="/assets/js/ui/components/dashboard-shell.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/subject-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/paste-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/scale-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/edit-scale-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/excel-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/confirm-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/login-modal.js?v=3"></script>
+    <script src="/assets/js/ui/components/modals/tools-modal.js?v=3"></script>
+    <script src="/assets/js/ui/layout.js?v=3"></script>
+    <script src="/assets/js/ui/render.js?v=3"></script>
+    <script src="/assets/js/features/subjects.js?v=3"></script>
+    <script src="/assets/js/features/paste.js?v=3"></script>
+    <script src="/assets/js/features/excel.js?v=3"></script>
+    <script src="/assets/js/ui/modals.js?v=3"></script>
+    <script src="/assets/js/features/auth.js?v=3"></script>
+    <script src="/assets/js/features/tour.js?v=3"></script>
+    <script src="/assets/js/app.js?v=3"></script>
     
     <!-- Help Button to replay tour -->
     <button id="btnHelpGuide" class="btn-help" title="Xem lại hướng dẫn (Kéo để di chuyển)">?</button>
   </body>
 </html>
+

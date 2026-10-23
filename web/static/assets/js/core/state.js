@@ -120,6 +120,11 @@ function saveState() {
     return;
   }
 
+  // Lưu bản sao offline theo tài khoản nếu có module PWA
+  if (typeof cacheOfflineData === "function") {
+    cacheOfflineData();
+  }
+
   // Gọi hàm API nếu nó đã được nạp (trong api.js)
   if (typeof saveDataToBackend === "function") {
     // Để không bị lỗi undefined do load file chưa xong

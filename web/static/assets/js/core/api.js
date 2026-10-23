@@ -1,19 +1,16 @@
 // =================== API CLIENT ===================
 
+// Trả về dữ liệu người dùng, hoặc null nếu tài khoản mới chưa có dữ liệu.
+// Ném lỗi khi không gọi được máy chủ để nơi gọi quyết định cách xử lý (VD: dùng bản offline).
 async function loadDataFromBackend() {
   if (!currentUser) return null;
-  try {
-    const token = await currentUser.getIdToken();
-    const res = await fetch("/api/grades/load", {
-      headers: { Authorization: "Bearer " + token }
-    });
-    if (!res.ok) throw new Error("Load failed");
-    const json = await res.json();
-    return json.data;
-  } catch (err) {
-    console.error("Lỗi khi tải dữ liệu từ Backend:", err);
-    return null;
-  }
+  const token = await currentUser.getIdToken();
+  const res = await fetch("/api/grades/load", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  if (!res.ok) throw new Error("Load failed: " + res.status);
+  const json = await res.json();
+  return json.data;
 }
 
 let saveTimeout = null;

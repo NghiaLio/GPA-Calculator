@@ -4,34 +4,87 @@ function headerTemplate() {
       <div class="header-left">
         <h1>📊 Bảng Điểm Học Tập</h1>
         <p>
-          Quản lý điểm & tính GPA theo thang điểm 4 | Tự động tính ĐQT · Điểm HP
-          · Điểm chữ
+          Quản lý điểm & tính GPA theo thang điểm 4 | Tự động tính ĐQT · Điểm HP · Điểm chữ
         </p>
       </div>
       <div class="header-right">
-        <div id="userProfile" class="hidden" style="display: flex; align-items: center; gap: 8px; margin-right: 12px; background: white; padding: 4px 12px 4px 4px; border-radius: 20px; border: 1px solid var(--gray-200);">
-          <img id="userAvatar" src="" style="width: 28px; height: 28px; border-radius: 50%;">
-          <span id="userName" style="font-size: 13px; font-weight: 500; color: var(--gray-700);"></span>
-          <button onclick="logoutFirebase()" style="background: none; border: none; color: var(--red); font-weight: 600; font-size: 13px; cursor: pointer; padding: 0 8px; border-left: 1px solid var(--gray-200); margin-left: 4px;">Thoát</button>
+        <div id="userProfile" class="hidden user-profile">
+          <img id="userAvatar" src="" alt="Avatar">
+          <span id="userName"></span>
+          <button onclick="logoutFirebase()" class="btn-logout" title="Đăng xuất khỏi tài khoản">Thoát</button>
         </div>
-        <button id="loginBtnHeader" class="btn btn-outline btn-header hidden" style="margin-right: 12px; display: none;" onclick="document.getElementById('loginModal').classList.remove('hidden')">
+        <button id="loginBtnHeader" class="btn btn-outline btn-header hidden" onclick="document.getElementById('loginModal').classList.remove('hidden')">
           ☁️ Đăng nhập
         </button>
-        <div id="syncBtnHeader" class="btn btn-outline btn-header hidden" style="margin-right: 12px; background-color: var(--blue-bg); color: var(--blue); border-color: var(--blue); cursor: default; pointer-events: none;">
+        <div id="syncBtnHeader" class="btn btn-outline btn-header sync-badge hidden">
           ☁️ Đã đồng bộ
+        </div>
+        <button
+          id="btnTheme"
+          class="btn btn-outline btn-header btn-icon"
+          onclick="toggleTheme()"
+          title="Đổi giao diện sáng / tối"
+          aria-label="Đổi giao diện sáng tối"
+        >
+          🌙
+        </button>
+        <button
+          id="btnTools"
+          class="btn btn-outline btn-header"
+          onclick="openToolsModal()"
+          title="Mở bộ công cụ: Mục tiêu GPA, Mô phỏng điểm, Tiến độ & Lịch sử"
+        >
+          🧮 Công cụ
+        </button>
+        <div class="dropdown">
+          <button
+            id="btnExport"
+            class="btn btn-outline btn-header"
+            onclick="toggleExportMenu(event)"
+            title="Xuất bảng điểm sang Excel, PDF hoặc ảnh"
+            aria-expanded="false"
+          >
+            ⬇ Xuất ▾
+          </button>
+          <div id="exportMenu" class="dropdown-menu hidden">
+            <button class="dropdown-item" onclick="exportToExcel(); closeExportMenu();">
+              <span>📊</span>
+              <div>
+                <strong>Xuất Excel (.xlsx)</strong>
+                <small>Bảng tính đầy đủ công thức & học kỳ</small>
+              </div>
+            </button>
+            <button class="dropdown-item" onclick="exportPdf(); closeExportMenu();">
+              <span>📄</span>
+              <div>
+                <strong>In / Xuất PDF</strong>
+                <small>Bản in đẹp gọn gàng để nộp hoặc lưu trữ</small>
+              </div>
+            </button>
+            <button class="dropdown-item" onclick="exportImage(); closeExportMenu();">
+              <span>🖼️</span>
+              <div>
+                <strong>Xuất ảnh PNG</strong>
+                <small>Tạo ảnh nét để chia sẻ hoặc xem trên điện thoại</small>
+              </div>
+            </button>
+          </div>
         </div>
         <button
           id="btnOpenScaleModal"
           class="btn btn-outline btn-header"
           onclick="openScaleModal()"
+          title="Xem & tuỳ chỉnh thang điểm 4, điểm chữ và trọng số"
         >
           📋 Thang điểm
         </button>
         <button
-          class="btn btn-outline btn-header"
-          onclick="exportToExcel()"
+          id="btnInstall"
+          class="btn btn-outline btn-header hidden"
+          onclick="installApp()"
+          title="Cài đặt Bảng Điểm Học Tập lên máy tính / điện thoại"
         >
-          ⬇ Xuất Excel
+          📲 Cài đặt app
         </button>
       </div>
     </div>`;
@@ -50,24 +103,22 @@ function updateHeaderUserUI(user) {
     loginBtn.style.display = "none";
     if (syncBtn) {
       syncBtn.classList.remove("hidden");
-      syncBtn.style.display = "flex";
+      syncBtn.style.display = "inline-flex";
     }
     
-    document.getElementById("userAvatar").src = user.photoURL || "https://ui-avatars.com/api/?name=" + user.email;
+    document.getElementById("userAvatar").src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.email);
     document.getElementById("userName").textContent = user.displayName || user.email.split("@")[0];
   } else {
     profileDiv.classList.add("hidden");
     profileDiv.style.display = "none";
     loginBtn.classList.remove("hidden");
-    loginBtn.style.display = "flex";
+    loginBtn.style.display = "inline-flex";
     if (syncBtn) {
       syncBtn.classList.add("hidden");
       syncBtn.style.display = "none";
     }
   }
 }
-
-// Nút lưu thủ công đã bị loại bỏ vì hệ thống sử dụng Auto-save hoàn toàn.
 
 let syncTimeout = null;
 function setSyncStatus(status) {
@@ -95,9 +146,9 @@ function setSyncStatus(status) {
     btn.disabled = true;
   } else if (status === "success") {
     btn.innerHTML = "✅ Đã lưu";
-    btn.style.backgroundColor = "#dcfce7"; // bg-green-100
-    btn.style.color = "#166534"; // text-green-800
-    btn.style.borderColor = "#86efac"; // border-green-300
+    btn.style.backgroundColor = "var(--green-bg)";
+    btn.style.color = "var(--green)";
+    btn.style.borderColor = "var(--green)";
     btn.disabled = false;
     
     // Tự động trở về trạng thái gốc sau 2.5s
@@ -106,9 +157,15 @@ function setSyncStatus(status) {
     }, 2500);
   } else if (status === "error") {
     btn.innerHTML = "❌ Lỗi lưu";
-    btn.style.backgroundColor = "#fee2e2"; // bg-red-100
-    btn.style.color = "#991b1b"; // text-red-800
-    btn.style.borderColor = "#fca5a5"; // border-red-300
+    btn.style.backgroundColor = "var(--red-bg)";
+    btn.style.color = "var(--red)";
+    btn.style.borderColor = "var(--red)";
+    btn.disabled = false;
+  } else if (status === "offline") {
+    btn.innerHTML = "📡 Offline (lưu máy)";
+    btn.style.backgroundColor = "var(--amber-bg)";
+    btn.style.color = "var(--amber)";
+    btn.style.borderColor = "var(--amber)";
     btn.disabled = false;
   } else {
     // Trạng thái idle
@@ -116,5 +173,7 @@ function setSyncStatus(status) {
     btn.style.backgroundColor = "var(--blue-bg)";
     btn.style.color = "var(--blue)";
     btn.style.borderColor = "var(--blue)";
+    btn.disabled = false;
   }
 }
+

@@ -15,9 +15,18 @@ function overlayClose(e, id) {
 // Keyboard shortcuts
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
-    ["addModal", "pasteModal", "scaleModal", "excelModal", "editScaleModal"].forEach((id) => {
-      if (!document.getElementById(id).classList.contains("hidden"))
-        closeModal(id);
+    [
+      "addModal",
+      "pasteModal",
+      "scaleModal",
+      "excelModal",
+      "editScaleModal",
+      "toolsModal",
+      "loginModal",
+      "confirmModal",
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.classList.contains("hidden")) closeModal(id);
     });
   }
   if (

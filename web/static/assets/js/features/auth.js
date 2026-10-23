@@ -26,28 +26,15 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     try {
-      // Ưu tiên pull dữ liệu từ Backend / Firestore về trước
+      // Ưu tiên pull dữ liệu từ Backend / Firestore về trước (ném lỗi nếu thất bại)
       const cloudData = await loadDataFromBackend();
 
       if (cloudData && (cloudData.subjects?.length > 0 || cloudData.scale || cloudData.weights)) {
         // Có dữ liệu trên đám mây -> Nạp vào state
-        if (cloudData.scale) currentGrades = cloudData.scale;
-        if (cloudData.weights) currentWeights = cloudData.weights;
-        if (cloudData.subjects) {
-          subjects = cloudData.subjects;
-          _id = Math.max(...subjects.map(s => s.id), 0) + 1;
-        }
-        
-        // Cập nhật lại sessionStorage theo dữ liệu đám mây
-        sessionStorage.setItem("app_grades", JSON.stringify(currentGrades));
-        sessionStorage.setItem("app_weights", JSON.stringify(currentWeights));
-        sessionStorage.setItem("app_subjects", JSON.stringify(subjects));
-        
-        renderShell(); // Cập nhật lại toàn bộ DOM
-        updateHeaderUserUI(currentUser); // Phục hồi Header
-        renderScaleModalUI(); // Nạp lại form thang điểm
-        renderAll(); // Nạp lại bảng dữ liệu
-        
+        applyUserData(cloudData);
+        clearHistory(); // dữ liệu cũ trước khi đồng bộ không còn ý nghĩa để hoàn tác
+        cacheOfflineData();
+
         showToast("Đã đồng bộ dữ liệu từ đám mây", "success");
         if (typeof setSyncStatus === "function") {
           setSyncStatus("idle");
@@ -72,8 +59,23 @@ auth.onAuthStateChanged(async (user) => {
       }
     } catch (err) {
       console.error("Lỗi khi kéo dữ liệu lúc đăng nhập:", err);
-      if (typeof setSyncStatus === "function") {
-        setSyncStatus("error");
+
+      // Không kết nối được máy chủ: dùng bản dữ liệu đã lưu trên thiết bị (nếu có)
+      const cached = readOfflineData();
+      if (cached && (cached.subjects?.length > 0 || cached.scale || cached.weights)) {
+        applyUserData(cached);
+        clearHistory();
+        window.pendingCloudSync = false;
+        showToast(
+          "Không kết nối được máy chủ. Đang dùng dữ liệu đã lưu trên thiết bị.",
+          "warning",
+          { duration: 5000 },
+        );
+        if (typeof setSyncStatus === "function") {
+          setSyncStatus(navigator.onLine ? "error" : "offline");
+        }
+      } else if (typeof setSyncStatus === "function") {
+        setSyncStatus(navigator.onLine ? "error" : "offline");
       }
     } finally {
       isSyncingFromCloud = false;
@@ -84,6 +86,26 @@ auth.onAuthStateChanged(async (user) => {
     updateHeaderUserUI(null);
   }
 });
+
+// Nạp dữ liệu người dùng (từ đám mây hoặc bản offline) vào state và vẽ lại giao diện
+function applyUserData(data) {
+  if (data.scale) currentGrades = data.scale;
+  if (data.weights) currentWeights = data.weights;
+  if (data.subjects) {
+    subjects = data.subjects;
+    _id = Math.max(...subjects.map((s) => s.id), 0) + 1;
+  }
+
+  // Cập nhật lại sessionStorage theo dữ liệu nạp vào
+  sessionStorage.setItem("app_grades", JSON.stringify(currentGrades));
+  sessionStorage.setItem("app_weights", JSON.stringify(currentWeights));
+  sessionStorage.setItem("app_subjects", JSON.stringify(subjects));
+
+  renderShell(); // Cập nhật lại toàn bộ DOM
+  updateHeaderUserUI(currentUser); // Phục hồi Header
+  renderScaleModalUI(); // Nạp lại form thang điểm
+  renderAll(); // Nạp lại bảng dữ liệu
+}
 
 // Hàm gọi đăng nhập Google
 function loginWithGoogle() {

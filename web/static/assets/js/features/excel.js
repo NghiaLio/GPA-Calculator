@@ -66,6 +66,9 @@ function handleExcel(input) {
 
       const msg = `Tìm thấy ${imported.length} môn học trong file "${file.name}".\n\nNhấn OK để thêm vào danh sách hiện tại.\nNhấn Cancel để thay thế toàn bộ.`;
       const confirmed = await showConfirm(msg);
+      pushHistory(
+        `${confirmed ? "Thêm" : "Thay thế bằng"} ${imported.length} môn từ Excel`,
+      );
       if (confirmed) subjects = [...subjects, ...imported];
       else subjects = imported;
       input.value = "";

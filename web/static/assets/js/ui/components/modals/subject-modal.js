@@ -38,7 +38,34 @@ function subjectModalTemplate() {
                 oninput="updatePreview()"
               />
             </div>
-            <div class="form-group"></div>
+            <div class="form-group">
+              <label class="form-label" for="f_hocKy">Học kỳ</label>
+              <select id="f_hocKy">
+                <option value="">— Chưa xác định —</option>
+                <option value="1">Học kỳ 1</option>
+                <option value="2">Học kỳ 2</option>
+                <option value="Hè">Học kỳ hè</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="f_namHoc">Năm học</label>
+              <input
+                type="text"
+                id="f_namHoc"
+                list="namHocList"
+                placeholder="VD: 2024-2025"
+                maxlength="9"
+                autocomplete="off"
+              />
+              <datalist id="namHocList"></datalist>
+            </div>
+            <div class="form-group full">
+              <label class="check-line" for="f_hocLai" title="Nếu trùng tên với môn khác, chỉ lần có điểm cao nhất được tính vào GPA">
+                <input type="checkbox" id="f_hocLai" />
+                <span>🔁 Môn học lại / cải thiện điểm</span>
+                <span class="muted-label">— chỉ tính lần điểm cao nhất</span>
+              </label>
+            </div>
             <div class="form-group">
               <label
                 class="form-label"
